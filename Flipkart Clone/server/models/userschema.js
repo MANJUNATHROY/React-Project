@@ -48,14 +48,21 @@ const Userschema = mongoose.Schema({
 
 Userschema.virtual('password')
 .set(function(password){
-    this.hash_password = bcrypt.hashSync(password,10);
+    const salt = bcrypt.genSaltSync(10);
+    this.hash_password = bcrypt.hashSync(password,salt);
 });
 
-Userschema.method = {
+Userschema.virtual('fullName')
+.set(function(){
+    return `${fullName} ${lastName}`;
+})
+
+Userschema.methods = {
     authenticate: function(password){
         return bcrypt.compareSync(password,this.hash_password);
     }
 }
 
+const Schema = mongoose.model('User',Userschema);
 
-export default Userschema;
+export default Schema;
